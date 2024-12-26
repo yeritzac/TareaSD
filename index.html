@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comentarios App</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { margin-bottom: 20px; }
+        .comentario { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Comentarios</h1>
+    <form id="comentarioForm">
+        <input type="text" id="nombre" placeholder="Tu nombre" required />
+        <textarea id="comentario" placeholder="Tu comentario" required></textarea>
+        <button type="submit">Enviar</button>
+    </form>
+    <div id="comentariosList"></div>
+
+    <script>
+        const form = document.getElementById('comentarioForm');
+        const comentariosList = document.getElementById('comentariosList');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('nombre').value;
+            const comentario = document.getElementById('comentario').value;
+
+            await fetch('/api/comentarios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, comentario })
+            });
+
+            form.reset();
+            cargarComentarios();
+        });
+
+        async function cargarComentarios() {
+            const response = await fetch('/api/comentarios');
+            const comentarios = await response.json();
+            comentariosList.innerHTML = '';
+            comentarios.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'comentario';
+                div.textContent = `${c.nombre}: ${c.comentario}`;
+                comentariosList.appendChild(div);
+            });
+        }
+
+        cargarComentarios();
+    </script>
+</body>
+</html>
